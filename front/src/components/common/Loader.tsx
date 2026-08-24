@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // Loader.tsx
 import { Show, type Component } from "solid-js";

@@ -1,6 +1,7 @@
 
 // src/services/productService.ts
 import { http } from "./http";
+import { productActions, getPageProducts as _getPageProducts } from "../stores/productStore";
 import { useProductStore } from "../stores/productStore";
 import type { ProductQuery } from "../stores/productStore";
 import type { Product, ProductDetail } from "../types/product";
@@ -31,13 +32,11 @@ export async function loadProducts(
   query: ProductQuery,
   opts: { force?: boolean } = {},
 ): Promise<void> {
-  const store = useProductStore.getState();
+  // ۱) کش‌آگاهی
+  if (!opts.force && _getPageProducts(query) !== undefined) return;
 
-  // ۱) کش‌آگاهی: اگر این نما قبلاً کش شده و force نیست، شبکه لازم نیست.
-  if (!opts.force && store.getPageProducts(query) !== undefined) return;
-
-  // ۲) گذارِ loading — به تفکیکِ همین query، نه سراسری.
-  store.setListLoading(query);
+  // ۲) گذارِ loading
+  productActions.setListLoading(query);
 
   // ۳) شبکه؛ http نتیجه را به union از پیش تبدیل کرده.
   const res = await http.get<Paginated<Product>>(
@@ -46,9 +45,9 @@ export async function loadProducts(
 
   // ۴) نگاشتِ union به گذارِ استور — تنها جایی که success/error تصمیم می‌شود.
   if (res.ok) {
-    store.setPage(query, res.data);
+    productActions.setPage(query, res.data);
   } else {
-    store.setError(res.error);
+    productActions.setError(res.error);
   }
 }
 
@@ -60,20 +59,17 @@ export async function loadProductDetail(
   productId: string,
   opts: { force?: boolean } = {},
 ): Promise<void> {
-  const store = useProductStore.getState();
+  // کشِ سنگین
+  if (!opts.force && useProductStore().detailById[productId]) return;
 
-  // کشِ سنگین را هم احترام بگذار — جزئیاتِ آمده دوباره نمی‌آید.
-  if (!opts.force && store.detailById[productId]) return;
-
-  store.setDetailLoading(productId);
+  productActions.setDetailLoading(productId);
 
   const res = await http.get<ProductDetail>(`/products/${productId}`);
 
   if (res.ok) {
-    // setDetail هم کشِ سنگین را پر می‌کند هم نسخهٔ سبک را در byId تازه می‌کند.
-    store.setDetail(res.data);
+    productActions.setDetail(res.data);
   } else {
-    store.setError(res.error);
+    productActions.setError(res.error);
   }
 }
 
@@ -83,12 +79,11 @@ export async function loadProductDetail(
  */
 export async function prefetchNextPage(query: ProductQuery): Promise<void> {
   const nextQuery: ProductQuery = { ...query, page: (query.page ?? 1) + 1 };
-  const store = useProductStore.getState();
-  if (store.getPageProducts(nextQuery) !== undefined) return; // قبلاً هست
+  if (_getPageProducts(nextQuery) !== undefined) return;
   const res = await http.get<Paginated<Product>>(
     `/products?${toParams(nextQuery).toString()}`,
   );
-  if (res.ok) store.setPage(nextQuery, res.data); // خطا؟ بی‌خیال، prefetch است.
+  if (res.ok) productActions.setPage(nextQuery, res.data);
 }
 
 

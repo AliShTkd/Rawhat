@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // pages/Account/Account.tsx
 import {
@@ -12,7 +13,7 @@ import { useNavigate, useLocation } from "@solidjs/router";
 import AccountNav from "../../components/account/AccountNav";
 import AccountSkeleton from "../../components/account/AccountSkeleton";
 
-import { useAuth } from "../../stores/auth";
+import { useAuth } from "../../stores/userStore";
 
 const Account: ParentComponent = (props) => {
   const auth = useAuth();

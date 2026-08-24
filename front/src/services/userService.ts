@@ -1,7 +1,7 @@
 
 // src/services/userService.ts
 import { http } from "./http";
-import { useUserStore } from "../stores/userStore";
+import { setUserActions } from "../stores/userStore";
 import type { User, ProfilePatch, PasswordChange } from "../types/user";
 
 /**
@@ -20,16 +20,15 @@ import type { User, ProfilePatch, PasswordChange } from "../types/user";
  * پس res.data را جایگزین می‌کنیم، نه patchِ محلی را.
  */
 export async function updateProfile(patch: ProfilePatch): Promise<boolean> {
-  const store = useUserStore.getState();
-  store.setSaving();
+  setUserActions.setSaving();
 
   const res = await http.patch<User>("/users/me", patch);
 
   if (res.ok) {
-    store.setUser(res.data); // جایگزینی با حقیقتِ آشتی‌شدهٔ سرور.
+    setUserActions.setUser(res.data);
     return true;
   }
-  store.setSaveError(res.error);
+  setUserActions.setSaveError(res.error);
   return false;
 }
 
@@ -40,16 +39,15 @@ export async function updateProfile(patch: ProfilePatch): Promise<boolean> {
  * پس اینجا clearUser هم نمی‌کنیم — کاربر همان‌جا که هست می‌ماند.
  */
 export async function changePassword(payload: PasswordChange): Promise<boolean> {
-  const store = useUserStore.getState();
-  store.setSaving();
+  setUserActions.setSaving();
 
   const res = await http.post<void>("/users/me/password", payload);
 
   if (res.ok) {
-    store.clearSaving(); // فقط قفلِ ذخیره باز می‌شود؛ به User دست نمی‌زنیم.
+    setUserActions.clearSaving();
     return true;
   }
-  store.setSaveError(res.error);
+  setUserActions.setSaveError(res.error);
   return false;
 }
 
@@ -60,8 +58,7 @@ export async function changePassword(payload: PasswordChange): Promise<boolean> 
  * موفقیت → آدرسِ تازهٔ آواتار در res.data، پس setUser (قابل‌نمایش است).
  */
 export async function uploadAvatar(file: File): Promise<boolean> {
-  const store = useUserStore.getState();
-  store.setSaving();
+  setUserActions.setSaving();
 
   const form = new FormData();
   form.append("avatar", file);
@@ -69,10 +66,10 @@ export async function uploadAvatar(file: File): Promise<boolean> {
   const res = await http.post<User>("/users/me/avatar", form);
 
   if (res.ok) {
-    store.setUser(res.data);
+    setUserActions.setUser(res.data);
     return true;
   }
-  store.setSaveError(res.error);
+  setUserActions.setSaveError(res.error);
   return false;
 }
 

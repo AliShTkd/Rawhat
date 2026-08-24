@@ -1,8 +1,8 @@
 
 // src/services/orderService.ts
 import { http } from "./http";
-import { useOrderStore } from "../stores/orderStore";
-import { useCartStore } from "../stores/cartStore";
+import { orderActions } from "../stores/orderStore";
+import { cartActions } from "../stores/cartStore";
 import type { OrderQuery } from "../stores/orderStore";
 import type { Order, OrderSummary, CheckoutPayload } from "../types/order";
 import type { Paginated } from "../types/api";
@@ -28,18 +28,15 @@ function toParams(query: OrderQuery): URLSearchParams {
  */
 export async function loadOrders(
   query: OrderQuery,
-  opts: { force?: boolean } = {},
+  _opts: { force?: boolean } = {},
 ): Promise<void> {
-  const store = useOrderStore.getState();
-  if (!opts.force && store.getPageOrders(query) !== undefined) return;
-
-  store.setListLoading(query);
+  orderActions.setListLoading();
   const res = await http.get<Paginated<OrderSummary>>(
     `/orders?${toParams(query).toString()}`,
   );
 
-  if (res.ok) store.setPage(query, res.data);
-  else store.setError(res.error);
+  if (res.ok) orderActions.setOrderPage(res.data);
+  else orderActions.setError(res.error);
 }
 
 /**
@@ -48,16 +45,13 @@ export async function loadOrders(
  */
 export async function loadOrderDetail(
   orderId: string,
-  opts: { force?: boolean } = {},
+  _opts: { force?: boolean } = {},
 ): Promise<void> {
-  const store = useOrderStore.getState();
-  if (!opts.force && store.detailById[orderId]) return;
-
-  store.setDetailLoading(orderId);
+  orderActions.setDetailLoading(orderId);
   const res = await http.get<Order>(`/orders/${orderId}`);
 
-  if (res.ok) store.setDetail(res.data);
-  else store.setError(res.error);
+  if (res.ok) orderActions.setOrderDetail(res.data);
+  else orderActions.setError(res.error);
 }
 
 /**
@@ -68,11 +62,7 @@ export async function loadOrderDetail(
 export async function checkout(
   payload: CheckoutPayload,
 ): Promise<string | null> {
-  const orders = useOrderStore.getState();
-  const cart = useCartStore.getState();
-
-  // قفلِ صریح: تا سرور جواب ندهد، هیچ سفارشی وجود ندارد.
-  orders.setPlacing();
+  orderActions.setPlacing();
 
   // کلیدِ ایدمپوتنسی: سپرِ «دوبار خرید». کلیکِ دوم = همان سفارش، نه سفارشِ نو.
   const idempotencyKey = crypto.randomUUID();
@@ -85,13 +75,13 @@ export async function checkout(
 
   if (res.ok) {
     // دو گذارِ هم‌زمان — تنها جایی که یک موفقیت به دو استور دست می‌زند.
-    orders.prependNewOrder(res.data); // سفارشِ نو به بالای فهرست.
-    cart.clearCart();                 // سبد تبدیل به سفارش شد؛ خالی می‌شود.
+    orderActions.prependNewOrder(res.data);
+    cartActions.clearCart();
     return res.data.id;
   }
 
   // شکست → سفارشی ساخته نشده؛ فقط خطا. سبد دست‌نخورده می‌ماند تا کاربر دوباره تلاش کند.
-  orders.setPlaceError(res.error);
+  orderActions.setPlaceError(res.error);
   return null;
 }
 
@@ -168,3 +158,19 @@ export async function checkout(
 // services/http.ts — که حالا چهار سرویسِ واقعی رویش سوارند، و مجموعِ طلب‌هایشان دیگر یک امضای کامل است: union برگرداند، credentials: "include" بفرستد، چهار فعل داشته باشد، تلهٔ سراسریِ ۴۰۱ را بزند، و حالا آرگومانِ { headers } را هم بپذیرد. دیگر ذره‌ای ابهام نمانده که این فایل چه باید بکند — چون چهار مصرف‌کننده‌اش، خط‌به‌خط، قراردادش را تعریف کرده‌اند. http.ts دیگر یک صفحهٔ سفید نیست؛ یک جای خالیِ دقیقاً اندازه‌گیری‌شده است.
 
 // برویم بالاخره services/http.ts را بسازیم؟ این‌بار نه یک سرویس، که چهار سرویس بی‌آن کامپایل نمی‌شوند — و دیگر واقعاً، واقعاً هیچ فایلی نمانده که بشود جلویش انداخت
+// aliases for pages — return data directly for createResource
+export async function fetchOrders(
+  page: number,
+): Promise<Paginated<OrderSummary>> {
+  const res = await http.get<Paginated<OrderSummary>>(
+    `/orders?page=${page}`,
+  );
+  if (res.ok) return res.data;
+  return { items: [], page: 1, pageSize: 20, total: 0, totalPages: 0, hasMore: false };
+}
+
+export async function fetchOrderById(id: string): Promise<Order | null> {
+  const res = await http.get<Order>(`/orders/${id}`);
+  if (res.ok) return res.data;
+  return null;
+}

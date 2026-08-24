@@ -1,8 +1,8 @@
 // CartItem.tsx
 import { Show, type Component, type JSX } from "solid-js";
-import Price from "./Price";
-import QuantitySelector from "./QuantitySelector";
-import IconButton from "./IconButton";
+import Price from "../common/Price";
+import QuantitySelector from "../common/QuantitySelector";
+import IconButton from "../common/IconButton";
 
 export interface CartItemData {
   id: string | number;

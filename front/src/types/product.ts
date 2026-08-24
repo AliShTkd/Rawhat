@@ -90,16 +90,14 @@ export interface ProductDetail extends Product {
   related?: ReadonlyArray<Product>;
 }
 
-/** شکلِ صفحه‌بندی‌شدهٔ مشترک برای همهٔ لیست‌ها. */
-export interface Paginated<T> {
-  items: ReadonlyArray<T>;
-  total: number;
-  page: number;
-  totalPages: number;
-}
+/**
+ * بازصادرِ `Paginated` — خانهٔ اصلی‌اش `api.ts` است.
+ * این خط فقط برای عقب‌سازگاری است.
+ */
+export type { Paginated } from "./api";
 
 /** میان‌بُرِ پرکاربرد: یک صفحهٔ نتیجهٔ محصول. */
-export type ProductPage = Paginated<Product>;
+export type ProductPage = import("./api").Paginated<Product>;
 
 
 

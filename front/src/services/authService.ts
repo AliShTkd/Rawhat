@@ -1,7 +1,7 @@
 
 // src/services/authService.ts
 import { http } from "./http";
-import { useUserStore } from "../stores/userStore";
+import { setUserActions } from "../stores/userStore";
 import type { User, Credentials, RegisterPayload } from "../types/user";
 
 /**
@@ -17,17 +17,15 @@ import type { User, Credentials, RegisterPayload } from "../types/user";
  * موفقیت: کوکی نشسته و پروفایل برمی‌گردد → setUser.
  */
 export async function login(credentials: Credentials): Promise<boolean> {
-  const store = useUserStore.getState();
-  store.setAuthLoading();
+  setUserActions.setAuthLoading();
 
   const res = await http.post<User>("/auth/login", credentials);
 
   if (res.ok) {
-    store.setUser(res.data);
+    setUserActions.setUser(res.data);
     return true;
   }
-  // خطای ورود (۴۰۱ = رمزِ غلط) این‌جا واقعاً خطاست — برخلافِ bootstrap.
-  store.setAuthError(res.error);
+  setUserActions.setAuthError(res.error);
   return false;
 }
 
@@ -36,16 +34,15 @@ export async function login(credentials: Credentials): Promise<boolean> {
  * کوکی را هم می‌نشاند (ثبت‌نام = ورودِ خودکار).
  */
 export async function register(payload: RegisterPayload): Promise<boolean> {
-  const store = useUserStore.getState();
-  store.setAuthLoading();
+  setUserActions.setAuthLoading();
 
   const res = await http.post<User>("/auth/register", payload);
 
   if (res.ok) {
-    store.setUser(res.data);
+    setUserActions.setUser(res.data);
     return true;
   }
-  store.setAuthError(res.error);
+  setUserActions.setAuthError(res.error);
   return false;
 }
 
@@ -55,13 +52,8 @@ export async function register(payload: RegisterPayload): Promise<boolean> {
  * پس clearUser بی‌قید‌وشرط، چه سرور جواب بدهد چه ندهد.
  */
 export async function logout(): Promise<void> {
-  const store = useUserStore.getState();
-
-  // به سرور خبر می‌دهیم تا کوکی را باطل کند — ولی نتیجه‌اش را گرو نمی‌گیریم.
   await http.post<void>("/auth/logout", undefined);
-
-  // پاک‌سازیِ محلی همیشه اتفاق می‌افتد. UI نباید در حالتِ «شاید وارد» گیر کند.
-  store.clearUser();
+  setUserActions.clearUser();
 }
 
 /**
@@ -70,24 +62,21 @@ export async function logout(): Promise<void> {
  * ۴۰۱ باید به یک حالتِ عادی ترجمه شود، نه به setError.
  */
 export async function fetchCurrentUser(): Promise<void> {
-  const store = useUserStore.getState();
-  store.setAuthLoading();
+  setUserActions.setAuthLoading();
 
   const res = await http.get<User>("/auth/me");
 
   if (res.ok) {
-    store.setUser(res.data);
+    setUserActions.setUser(res.data);
     return;
   }
 
-  // ۴۰۱/۴۰۳ → مهمان، یک حالتِ معتبر و ساکت.
   if (res.error.status === 401 || res.error.status === 403) {
-    store.clearUser();
+    setUserActions.clearUser();
     return;
   }
 
-  // فقط خطاهای واقعی (۵۰۰، شبکه) به‌عنوانِ خطا نشان داده می‌شوند.
-  store.setAuthError(res.error);
+  setUserActions.setAuthError(res.error);
 }
 
 
@@ -148,3 +137,12 @@ export async function fetchCurrentUser(): Promise<void> {
 // services/http.ts — که حالا دو سرویسِ واقعی رویش نوشته شده و هیچ‌کدام بدونش کامپایل نمی‌شوند. دیگر بحثِ «استورها منتظرند» نیست؛ دو فایلِ مشخص (productService, authService) همین حالا http.get/http.post را صدا می‌زنند، به res.ok/res.error تکیه می‌کنند، و authService حتی به رفتارِ داخلیِ ۴۰۱‌اش وابسته است. آن تلهٔ ۴۰۱ که به clearUser وصل می‌شود، دیگر یک ایده نیست — یک قراردادی است که این فایل صریح فرض کرد.
 
 // برویم services/http.ts را بسازیم و بالاخره زیرِ پای این دو سرویس را سفت کنیم؟
+export async function requestPasswordReset(email: string): Promise<boolean> {
+  const res = await http.post<void>("/auth/forgot-password", { email });
+  return res.ok;
+}
+
+export async function resetPassword(token: string, newPassword: string): Promise<boolean> {
+  const res = await http.post<void>("/auth/reset-password", { token, newPassword });
+  return res.ok;
+}

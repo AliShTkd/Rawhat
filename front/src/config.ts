@@ -23,11 +23,6 @@ function required(key: string): string {
   return v;
 }
 
-function optional(key: string, fallback: string): string {
-  const v = import.meta.env[key];
-  return v == null || v === "" ? fallback : v;
-}
-
 function asInt(key: string, fallback: number): number {
   const raw = import.meta.env[key];
   if (raw == null || raw === "") return fallback;

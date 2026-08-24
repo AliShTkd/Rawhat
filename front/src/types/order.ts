@@ -123,6 +123,17 @@ export interface OrderSummary {
   thumbnail?: ProductImage;
 }
 
+/**
+ * ورودیِ فرآیندِ پرداخت — قراردادِ `services/order.checkout`.
+ */
+export interface CheckoutPayload {
+  shippingAddress: Address;
+  billingAddress?: Address;
+  paymentMethod: "online" | "cash_on_delivery" | "wallet";
+  /** یادداشتِ اختیاریِ مشتری. */
+  note?: string;
+}
+
 
 
 

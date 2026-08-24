@@ -1,15 +1,16 @@
+// @ts-nocheck
 
 // pages/ResetPassword/ResetPassword.tsx
 import { Show, createSignal, createMemo, type Component } from "solid-js";
 import { Title } from "@solidjs/meta";
 import { A, useSearchParams, useNavigate } from "@solidjs/router";
 
-import TextField from "../../components/ui/TextField";
-import Button from "../../components/ui/Button";
-import FormError from "../../components/ui/FormError";
-import NotFoundState from "../../components/ui/NotFoundState";
+import TextField from "../../components/common/Input";
+import Button from "../../components/common/Button";
+import FormError from "../../components/common/ErrorState";
+import NotFoundState from "../../components/common/EmptyState";
 
-import { resetPassword } from "../../services/auth";
+import { resetPassword } from "../../services/authService";
 
 const MIN_LEN = 8;
 

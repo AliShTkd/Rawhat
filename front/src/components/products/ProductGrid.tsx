@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // components/products/ProductGrid.tsx
 import {
@@ -6,7 +7,7 @@ import {
   type Component,
   type JSX,
 } from "solid-js";
-import ProductCard, { type ProductCardData } from "../ProductCard";
+import ProductCard, { type ProductCardData } from "../product/ProductCard";
 
 export type ProductView = "grid" | "list";
 

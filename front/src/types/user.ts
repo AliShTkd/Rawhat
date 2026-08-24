@@ -85,6 +85,30 @@ export interface AuthSession {
   expiresAt?: string;
 }
 
+/** ورودیِ ویرایشِ پروفایل — قراردادِ `services/user.updateProfile`. */
+export interface ProfilePatch {
+  name?: string;
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+}
+
+/** ورودیِ تغییرِ رمز — قراردادِ `services/user.changePassword`. */
+export interface PasswordChange {
+  currentPassword: string;
+  newPassword: string;
+}
+
+/**
+ * نوعِ ورودیِ سرویسِ لاگین — برای اتصالِ authService.
+ */
+export type Credentials = LoginCredentials;
+
+/**
+ * نوعِ ورودیِ سرویسِ ثبت‌نام — برای اتصالِ authService.
+ */
+export type RegisterPayload = RegisterInput;
+
 
 
 

@@ -1,3 +1,4 @@
+/* ── Base Variables ── */
 :root {
   --text: #6b6375;
   --text-h: #08060d;
@@ -8,26 +9,16 @@
   --accent-bg: rgba(170, 59, 255, 0.1);
   --accent-border: rgba(170, 59, 255, 0.5);
   --social-bg: rgba(244, 243, 236, 0.5);
-  --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
-
+  --shadow: rgba(0,0,0,.1) 0 10px 15px -3px, rgba(0,0,0,.05) 0 4px 6px -2px;
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
   --mono: ui-monospace, Consolas, monospace;
-
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
+  --success: #16a34a;
+  --danger: #dc2626;
+  font: 16px/1.5 var(--sans);
   color: var(--text);
   background: var(--bg);
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -38,897 +29,229 @@
     --border: #2e303a;
     --code-bg: #1f2028;
     --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
+    --success: #22c55e;
+    --danger: #ef4444;
   }
 }
 
-body {
-  margin: 0;
-}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; }
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+img { max-width: 100%; height: auto; }
 
 #root {
-  width: 1126px;
-  max-width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
-  min-height: 100svh;
+  padding: 0 16px;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  box-sizing: border-box;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--text-h);
+h1, h2, h3, h4 { font-family: var(--heading); font-weight: 500; color: var(--text-h); }
+h1 { font-size: 2rem; margin: 1rem 0; }
+h2 { font-size: 1.5rem; margin: 0 0 0.5rem; }
+
+/* ── Page Spinner ── */
+.page-spinner { display: flex; justify-content: center; align-items: center; min-height: 50vh; }
+.page-spinner__circle {
+  width: 40px; height: 40px; border: 4px solid var(--border);
+  border-top-color: var(--accent); border-radius: 50%;
+  animation: spin .6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Button ── */
+.button, button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem;
+  padding: 0.5rem 1.25rem; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text-h); cursor: pointer; font: inherit;
+  transition: background .15s, border-color .15s;
+}
+.button:hover { background: var(--accent-bg); border-color: var(--accent-border); }
+.button--primary, .button-primary {
+  background: var(--accent); color: #fff; border-color: var(--accent);
+}
+.button--primary:hover { opacity: .9; }
+.button--sm { padding: 0.25rem 0.75rem; font-size: 0.875rem; }
+.button--lg { padding: 0.75rem 1.75rem; font-size: 1.125rem; }
+.button--block { width: 100%; }
+.button[disabled] { opacity: .5; cursor: not-allowed; }
+
+/* ── Input ── */
+.input { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 1rem; width: 100%; }
+.input__label { font-size: 0.875rem; font-weight: 500; color: var(--text-h); }
+.input__field {
+  padding: 0.5rem 0.75rem; border: 1px solid var(--border); border-radius: 8px;
+  font: inherit; color: var(--text-h); background: var(--bg);
+}
+.input__field:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-bg); }
+.input__error { color: var(--danger); font-size: 0.8rem; }
+.input--error .input__field { border-color: var(--danger); }
+
+/* ── Header ── */
+.header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid var(--border); }
+.header__logo { font-size: 1.25rem; font-weight: 600; color: var(--text-h); }
+.header__nav { display: flex; gap: 1rem; align-items: center; }
+.header__nav a { color: var(--text); font-size: 0.9rem; }
+
+/* ── Footer ── */
+.footer { margin-top: auto; padding: 2rem 0; border-top: 1px solid var(--border); text-align: center; color: var(--text); font-size: 0.875rem; }
+
+/* ── Product Card ── */
+.product-card {
+  border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+  transition: box-shadow .2s;
+}
+.product-card:hover { box-shadow: var(--shadow); }
+.product-card__media { position: relative; aspect-ratio: 1; overflow: hidden; background: #f5f5f5; }
+.product-card__image { width: 100%; height: 100%; object-fit: cover; }
+.product-card__badge { position: absolute; top: 8px; right: 8px; background: var(--danger); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; }
+.product-card__body { padding: 0.75rem; text-align: start; }
+.product-card__brand { font-size: 0.75rem; color: var(--text); margin-bottom: 0.25rem; }
+.product-card__name { font-size: 0.9rem; color: var(--text-h); margin: 0 0 0.5rem; line-height: 1.3; }
+.product-card__pricing { display: flex; gap: 0.5rem; align-items: baseline; margin-bottom: 0.5rem; }
+.product-card__price { font-weight: 600; color: var(--text-h); }
+.product-card__old-price { font-size: 0.8rem; color: var(--text); text-decoration: line-through; }
+.product-card__button { width: 100%; }
+
+/* ── Cart ── */
+.cart { padding: 1rem 0; }
+.cart__title { font-size: 1.5rem; margin-bottom: 1rem; }
+.cart__layout { display: grid; grid-template-columns: 1fr 340px; gap: 2rem; }
+@media (max-width: 768px) { .cart__layout { grid-template-columns: 1fr; } }
+.cart__items { display: flex; flex-direction: column; gap: 1rem; }
+.cart-item { display: grid; grid-template-columns: 80px 1fr auto; gap: 1rem; align-items: center; padding: 1rem; border: 1px solid var(--border); border-radius: 8px; }
+.cart-item__image { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; }
+.cart-summary { padding: 1rem; border: 1px solid var(--border); border-radius: 8px; position: sticky; top: 1rem; }
+.cart-summary__title { font-size: 1.1rem; margin-bottom: 1rem; }
+.cart-summary__row { display: flex; justify-content: space-between; padding: 0.5rem 0; }
+.cart-summary__row--total { font-weight: 600; border-top: 1px solid var(--border); padding-top: 0.75rem; }
+
+/* ── Empty / Error States ── */
+.empty-state, .empty-cart, .empty-wishlist, .empty-category, .no-search-results, .search-idle {
+  text-align: center; padding: 3rem 1rem; color: var(--text);
+}
+.empty-state__title { font-size: 1.25rem; color: var(--text-h); margin-bottom: 0.5rem; }
+.error-page, .error-state { text-align: center; padding: 3rem 1rem; }
+.empty-state__link, .empty-cart a, .empty-wishlist a { display: inline-block; margin-top: 1rem; }
+
+/* ── Skeletons ── */
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .4; } }
+.skeleton, [class*="skeleton"] {
+  background: var(--border); border-radius: 8px; animation: pulse 1.5s ease-in-out infinite;
+}
+.product-grid-skeleton { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+.product-grid-skeleton > div { height: 300px; }
+.page-spinner__circle { animation: spin .6s linear infinite; }
+
+/* ── Login ── */
+.login { display: grid; place-items: center; min-height: 60vh; }
+.login__card { max-width: 400px; width: 100%; padding: 2rem; border: 1px solid var(--border); border-radius: 12px; }
+.login__title { font-size: 1.25rem; text-align: center; margin-bottom: 0.5rem; }
+.login__subtitle { text-align: center; color: var(--text); font-size: 0.9rem; margin-bottom: 1.5rem; }
+.login__alert { background: #fef2f2; color: var(--danger); padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; text-align: center; }
+.login__form { display: flex; flex-direction: column; gap: 0.5rem; }
+.login__row { display: flex; justify-content: flex-end; }
+.login__forgot { font-size: 0.85rem; }
+.login__footer { text-align: center; margin-top: 1rem; font-size: 0.9rem; }
+.login__link { color: var(--accent); }
+
+/* ── Products Page ── */
+.products-page { padding: 1rem 0; }
+.products-page__header { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1rem; }
+.products-page__layout { display: grid; grid-template-columns: 240px 1fr; gap: 1.5rem; }
+@media (max-width: 768px) { .products-page__layout { grid-template-columns: 1fr; } }
+.products-page__sidebar { position: sticky; top: 1rem; align-self: start; }
+.products-page__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; list-style: none; padding: 0; margin: 0; }
+
+/* ── Pagination ── */
+.pagination { display: flex; justify-content: center; gap: 0.25rem; margin: 1.5rem 0; }
+.pagination__link, .pagination a {
+  padding: 0.4rem 0.75rem; border: 1px solid var(--border); border-radius: 6px;
+  color: var(--text); font-size: 0.875rem; text-decoration: none;
+}
+.pagination__link--current, .pagination a[aria-current="page"] {
+  background: var(--accent); color: #fff; border-color: var(--accent);
 }
 
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
+/* ── Account ── */
+.account { padding: 1rem 0; }
+.account__layout { display: grid; grid-template-columns: 200px 1fr; gap: 2rem; }
+@media (max-width: 768px) { .account__layout { grid-template-columns: 1fr; } }
+.account-nav { display: flex; flex-direction: column; gap: 0.5rem; }
+.account-nav a { padding: 0.5rem 0.75rem; border-radius: 6px; color: var(--text); }
+.account-nav a.active, .account-nav a[aria-current="page"] { background: var(--accent-bg); color: var(--accent); font-weight: 500; }
+
+/* ── Orders ── */
+.orders__list { display: flex; flex-direction: column; gap: 0.75rem; }
+.orders__item { border: 1px solid var(--border); border-radius: 8px; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+
+/* ── Wishlist ── */
+.wishlist__list { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; list-style: none; padding: 0; }
+.wishlist-item { border: 1px solid var(--border); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.wishlist-item__actions { display: flex; gap: 0.5rem; }
+
+/* ── Product Details ── */
+.product-details { padding: 1rem 0; }
+.product-gallery { display: flex; flex-direction: column; gap: 0.5rem; }
+.product-gallery__main { aspect-ratio: 1; border-radius: 12px; overflow: hidden; background: #f5f5f5; }
+.product-gallery__main img { width: 100%; height: 100%; object-fit: cover; }
+.product-gallery__thumbs { display: flex; gap: 0.5rem; }
+.product-gallery__thumbs button { padding: 0; border: 2px solid transparent; border-radius: 6px; cursor: pointer; background: none; width: 64px; height: 64px; }
+.product-gallery__thumbs button.active { border-color: var(--accent); }
+.product-gallery__thumbs img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; }
+.product-info { display: flex; flex-direction: column; gap: 0.75rem; }
+.product-info__name { font-size: 1.5rem; }
+.product-info__price { font-size: 1.25rem; font-weight: 600; }
+
+/* ── Tabs ── */
+.product-tabs__nav { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
+.product-tabs__nav button {
+  padding: 0.75rem 1rem; border: none; background: none; color: var(--text);
+  cursor: pointer; border-bottom: 2px solid transparent;
 }
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
-p {
-  margin: 0;
-}
+.product-tabs__nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
 
-code,
-.counter {
-  font-family: var(--mono);
-  display: inline-flex;
-  border-radius: 4px;
-  color: var(--text-h);
+/* ── Checkout ── */
+.checkout { padding: 1rem 0; }
+.checkout__layout { display: grid; grid-template-columns: 1fr 340px; gap: 2rem; }
+.checkout-step { padding: 1rem 0; }
+
+/* ── Search ── */
+.search { padding: 1rem 0; }
+
+/* ── Password Field ── */
+.password-field { position: relative; }
+.password-field__toggle {
+  position: absolute; top: 50%; right: 8px; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; font-size: 1.2rem; padding: 4px;
 }
 
-code {
-  font-size: 15px;
-  line-height: 135%;
-  padding: 4px 8px;
-  background: var(--code-bg);
+/* ── Rating ── */
+.rating { display: inline-flex; gap: 2px; color: #f59e0b; }
+.rating__star--empty { color: var(--border); }
+
+/* ── Product Reviews ── */
+.product-reviews__header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.product-reviews__summary { display: flex; gap: 2rem; align-items: center; margin-bottom: 1.5rem; }
+.product-reviews__average-number { font-size: 2rem; font-weight: 600; }
+.product-reviews__breakdown { list-style: none; padding: 0; }
+.product-reviews__breakdown-row { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem; }
+.product-reviews__breakdown-bar { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+.product-reviews__breakdown-fill { display: block; height: 100%; background: #f59e0b; border-radius: 4px; }
+.product-reviews__list { display: flex; flex-direction: column; gap: 1rem; }
+.review { padding: 1rem; border-bottom: 1px solid var(--border); }
+.review__header { display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.5rem; }
+.review__verified { color: var(--success); font-size: 0.8rem; }
+
+/* ── Not Found ── */
+.notfound { text-align: center; padding: 3rem 1rem; }
+.notfound__code { font-size: 4rem; font-weight: 700; color: var(--accent); }
+
+/* ── Utility ── */
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); border: 0;
 }
-
-hero
-hero__container
-hero__content
-hero__eyebrow
-hero__title
-hero__subtitle
-hero__actions
-hero__action
-hero__action--primary
-hero__action--secondary
-hero__extra
-hero__media
-hero__image
-
-
-
-
-
-category
-category__container
-category__title
-category__empty
-category__list
-category__item
-category__link
-category__media
-category__image
-category__name
-category__count
-
-
-
-featured
-featured__container
-featured__header
-featured__title
-featured__view-all
-featured__empty
-featured__list
-featured__item
-
-
-bestsellers
-bestsellers__container
-bestsellers__header
-bestsellers__title
-bestsellers__view-all
-bestsellers__empty
-bestsellers__list
-bestsellers__item
-bestsellers__rank
-
-
-
-
-promo-banner
-promo-banner--primary
-promo-banner--sale
-promo-banner--neutral
-promo-banner__container
-promo-banner__media
-promo-banner__image
-promo-banner__content
-promo-banner__title
-promo-banner__description
-promo-banner__action
-
-
-
-new-arrivals
-new-arrivals__container
-new-arrivals__header
-new-arrivals__title
-new-arrivals__view-all
-new-arrivals__empty
-new-arrivals__list
-new-arrivals__item
-new-arrivals__badge
-
-
-
-
-features
-features__container
-features__title
-features__empty
-features__list
-features__item
-features__icon
-features__body
-features__item-title
-features__item-description
-
-
-brands
-brands__container
-brands__title
-brands__empty
-brands__list
-brands__item
-brands__link
-brands__media
-brands__logo
-
-
-
-newsletter
-newsletter__container
-newsletter__content
-newsletter__title
-newsletter__description
-newsletter__form
-newsletter__field
-newsletter__label
-newsletter__input
-newsletter__submit
-newsletter__message
-newsletter__message--error
-newsletter__message--success
-
-
-
-
-
-
-
-product-card
-product-card__link
-product-card__media
-product-card__image
-product-card__badge
-product-card__badge--new
-product-card__badge--sale
-product-card__name
-product-card__pricing
-product-card__price
-product-card__original-price
-product-card__footer
-product-card__stock
-product-card__stock--out
-product-card__add
-
-
-
-
-category-card
-category-card__media
-category-card__image
-category-card__body
-category-card__name
-category-card__count
-
-
-
-brand-card
-brand-card--link
-brand-card__media
-brand-card__logo
-
-
-button
-button--primary
-button--secondary
-button--ghost
-button--danger
-button--sm
-button--md
-button--lg
-button--block
-button--loading
-button__spinner
-button__icon
-button__icon--leading
-button__icon--trailing
-button__label
-
-
-
-search-bar
-search-bar__label
-search-bar__field
-search-bar__input
-search-bar__clear
-search-bar__clear-icon
-search-bar__submit
-search-bar__submit-icon
-
-
-
-badge
-badge--neutral
-badge--primary
-badge--success
-badge--sale
-badge--danger
-badge--sm
-badge--md
-badge__content
-badge__sr-only
-
-
-
-rating
-rating__stars
-rating__stars--interactive
-rating__star
-rating__star--full
-rating__star--half
-rating__star--empty
-rating__star-button
-rating__star-button--active
-rating__count
-
-
-icon-button
-icon-button--solid
-icon-button--ghost
-icon-button--outline
-icon-button--sm
-icon-button--md
-icon-button--lg
-icon-button--loading
-icon-button__spinner
-icon-button__icon
-
-
-
-price
-price__current
-price__sr-only
-price__original
-price__discount
-
-
-
-quantity
-quantity__button
-quantity__button--decrease
-quantity__button--increase
-quantity__icon
-quantity__input
-
-
-input
-input--error
-input__label
-input__label--hidden
-input__required
-input__field
-input__hint
-input__error
-
-
-modal
-modal__backdrop
-modal__dialog
-modal__header
-modal__title
-modal__close
-modal__close-icon
-modal__body
-modal__footer
-
-
-
-loader
-loader--sm
-loader--md
-loader--lg
-loader--overlay
-loader--fullscreen
-loader__spinner
-loader__label
-loader__label--hidden
-
-
-empty-state
-empty-state__icon
-empty-state__content
-empty-state__title
-empty-state__description
-empty-state__action
-
-
-error-state
-error-state__icon
-error-state__content
-error-state__title
-error-state__description
-error-state__actions
-error-state__retry
-error-state__extra-action
-
-
-divider
-divider--horizontal
-divider--vertical
-divider--with-text
-divider__line
-divider__text
-
-
-cart-item
-cart-item--out-of-stock
-cart-item__media
-cart-item__image
-cart-item__info
-cart-item__name
-cart-item__stock-warning
-cart-item__unit-price
-cart-item__quantity
-cart-item__total
-cart-item__total-label
-cart-item__actions
-
-
-
-cart-summary
-cart-summary__title
-cart-summary__rows
-cart-summary__row
-cart-summary__row--discount
-cart-summary__row--total
-cart-summary__label
-cart-summary__label--total
-cart-summary__count
-cart-summary__value
-cart-summary__value--discount
-cart-summary__value--total
-cart-summary__free
-cart-summary__action
-
-
-product-gallery
-product-gallery--empty
-product-gallery__placeholder
-product-gallery__stage
-product-gallery__image
-product-gallery__thumbs
-product-gallery__thumb
-product-gallery__thumb--active
-product-gallery__thumb-image
-
-
-
-product-info
-product-info__brand
-product-info__name
-product-info__rating
-product-info__review-count
-product-info__price
-product-info__description
-product-info__stock
-product-info__stock-badge
-product-info__stock-badge--in
-product-info__stock-badge--out
-product-info__purchase
-product-info__quantity
-
-
-
-
-
-
-product-description
-product-description__title
-product-description__content
-product-description__content--collapsed
-product-description__toggle
-
-
-
-
-product-specs
-product-specs__title
-product-specs__group
-product-specs__group-title
-product-specs__list
-product-specs__row
-product-specs__label
-product-specs__value
-
-
-
-
-
-
-
-
-
-
-
-product-reviews
-product-reviews__header
-product-reviews__title
-product-reviews__summary
-product-reviews__average
-product-reviews__average-number
-product-reviews__total
-product-reviews__breakdown
-product-reviews__breakdown-row
-product-reviews__breakdown-star
-product-reviews__breakdown-bar
-product-reviews__breakdown-fill
-product-reviews__breakdown-count
-product-reviews__list
-product-reviews__item
-product-reviews__empty
-product-reviews__empty-text
-review
-review__header
-review__author
-review__verified
-review__date
-review__rating
-review__text
-
-
-
-
-
-
-
-
-
-
-
-related-products
-related-products__header
-related-products__title
-related-products__nav
-related-products__nav-btn
-related-products__nav-btn--prev
-related-products__nav-btn--next
-related-products__track
-related-products__item
-related-products__skeleton
-
-
-
-
-
-
-
-
-
-product-recommendations
-product-recommendations__heading
-product-recommendations__section
-
-
-
-
-
-
-
-
-
-
-products-page
-products-page__header
-products-page__title
-products-page__count
-products-page__layout
-products-page__sidebar
-products-page__content
-products-page__toolbar
-products-page__sort
-products-page__sort-label
-products-page__grid
-products-page__grid-item
-products-page__empty
-products-page__empty-text
-products-page__pagination
-products-page__skeleton
-
-
-
-
-
-
-
-products-header
-products-header__info
-products-header__title
-products-header__count
-products-header__count-loading
-products-header__tools
-products-header__filter-btn
-products-header__filter-btn-text
-products-header__filter-badge
-products-header__sort
-products-header__sort-label
-products-header__view
-products-header__view-btn
-products-header__view-btn--grid
-products-header__view-btn--list
-
-
-
-
-
-
-
-
-
-
-product-filters
-product-filters__header
-product-filters__title
-product-filters__clear
-product-filters__group
-product-filters__legend
-product-filters__options
-product-filters__option
-product-filters__check
-product-filters__check--stock
-product-filters__check-input
-product-filters__check-label
-product-filters__check-count
-product-filters__price
-product-filters__price-field
-product-filters__price-label
-product-filters__price-input
-product-filters__ratings
-product-filters__rating
-product-filters__rating-btn
-product-filters__rating-text
-
-
-
-
-
-
-
-product-sort
-product-sort--label-hidden
-product-sort__label
-product-sort__label--visually-hidden
-
-
-
-
-
-
-
-
-
-product-grid
-product-grid--grid
-product-grid--list
-product-grid--loading
-product-grid__list
-product-grid__item
-product-grid__skeleton
-product-grid__empty
-product-grid__empty-text
-
-
-
-
-
-
-
-
-pagination
-pagination__list
-pagination__item
-pagination__item--prev
-pagination__item--next
-pagination__item--ellipsis
-pagination__link
-pagination__link--prev
-pagination__link--next
-pagination__link--current
-pagination__ellipsis
-
-
-
-
-
-filter-sidebar
-filter-sidebar--desktop
-filter-sidebar--mobile
-filter-sidebar__inner
-filter-sidebar__overlay
-filter-sidebar__backdrop
-filter-sidebar__panel
-filter-sidebar__header
-filter-sidebar__title
-filter-sidebar__count
-filter-sidebar__close
-filter-sidebar__body
-filter-sidebar__footer
-filter-sidebar__apply
-/* (و یک کلاس روی body: has-open-drawer برای قفل اسکرول) */
-
-
-
-
-
-
-
-
-
-
-
-
-active-filters
-active-filters__heading
-active-filters__list
-active-filters__item
-active-filters__item--clear
-active-filters__chip
-active-filters__group
-active-filters__label
-active-filters__remove
-active-filters__clear-all
-
-
-
-
-
-
-product-results-count
-product-results-count--hidden
-product-results-count--loading
-product-results-count__spinner
-
-
-
-
-
-product-details
-product-details--error
-product-details--not-found
-product-details__error-text
-product-details__retry
-product-details__not-found-title
-product-details__not-found-text
-product-details__back-link
-product-details__main
-product-details__media
-product-details__info
-product-details__tabs
-product-details__related
-
-
-
-
-
-
-cart
-cart__title
-cart__count
-cart__layout
-cart__items
-cart__list
-cart__list-item
-cart__actions
-cart__continue
-cart__clear
-cart__summary
-
-
-
-checkout
-checkout__title
-checkout__layout
-checkout__form
-checkout__summary
-
-
-
-
-
-login
-login__card
-login__title
-login__subtitle
-login__alert
-login__form
-login__field
-login__row
-login__forgot
-login__footer
-login__link
-
-
-
-
-register
-register__card
-register__title
-register__subtitle
-register__alert
-register__form
-register__field
-register__field--terms
-register__link
-register__footer
-
-
-
-
-
-
-
-
-account
-account__title
-account__layout
-account__nav
-account__content
-
-
-
-
-
-
-wishlist
-wishlist__head
-wishlist__title
-wishlist__count
-wishlist__list
-wishlist__item
-wishlist__actions
-
-
-
-
-orders
-orders__head
-orders__title
-orders__count
-orders__list
-orders__item
-orders__pagination
-
-
-
-
-
-order-details
-order-details__back
-order-details__head
-order-details__heading
-order-details__title
-order-details__date
-order-details__grid
-order-details__items
-order-details__section-title
-order-details__list
-order-details__line
-order-details__side
-order-details__address
-order-details__actions
-order-details__invoice
-
-
-
-
-
-
-
-
-search
-search__head
-search__title
-search__count
-search__grid
-search__cell
-search__pagination
-
-
-
-
-
-category
-category__toolbar
-category__count
-category__grid
-category__cell
-category__pagination
-
-
-
-
-forgot
-forgot__card
-forgot__title
-forgot__hint
-forgot__form
-forgot__success
-forgot__success-text
-forgot__back
-forgot__links
-
-
-
-reset
-reset__card
-reset__title
-reset__hint
-reset__form
-reset__success
-reset__success-text
-reset__back
-reset__links
-
-
-
-
-
-
-
-notfound
-notfound__inner
-notfound__code
-notfound__title
-notfound__text
-notfound__actions

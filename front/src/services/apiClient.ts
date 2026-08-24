@@ -1,7 +1,9 @@
 
 // src/services/apiClient.ts
-import { useUserStore } from "../stores/userStore";
+import { getClearUser } from "../stores/userStore";
 import type { ApiError } from "../types/api";
+
+
 
 /**
  * apiClient = هستهٔ ترابری. تنها فعلِ واقعی: request.
@@ -14,7 +16,7 @@ export type ApiResult<T> =
   | { ok: true; data: T }
   | { ok: false; error: ApiError };
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? "/api";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "/api";
 
 export interface RequestOptions {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
@@ -48,12 +50,12 @@ export async function request<T>(
     res = await fetch(BASE_URL + path, init);
   } catch (err) {
     // قطعیِ شبکه/DNS/abort — throw هرگز به سرویس نمی‌رسد.
-    return { ok: false, error: { status: 0, message: msgOf(err) } };
+    return { ok: false, error: { status: 0, message: msgOf(err), kind: "network" as const } };
   }
 
   // تلهٔ سراسریِ ۴۰۱ — یگانه جایی که این لایه از مرزِ دامنه‌اش بیرون می‌زند.
   if (res.status === 401 && !skipAuthTrap) {
-    useUserStore.getState().clearUser(); // به نیابتِ هر شش سرویس، در یک گلوگاه.
+    getClearUser()(); // به نیابتِ هر شش سرویس، در یک گلوگاه.
     // جریان همچنان به شاخهٔ خطا می‌ریزد؛ تله فقط عارضهٔ جانبی است.
   }
 
@@ -74,9 +76,9 @@ async function safeJson<T>(res: Response): Promise<T> {
 async function parseError(res: Response): Promise<ApiError> {
   try {
     const b = await res.json();
-    return { status: res.status, message: b?.message ?? res.statusText, code: b?.code };
+    return { status: res.status, message: b?.message ?? res.statusText, code: b?.code, kind: "unknown" };
   } catch {
-    return { status: res.status, message: res.statusText };
+    return { status: res.status, message: res.statusText, kind: "unknown" };
   }
 }
 

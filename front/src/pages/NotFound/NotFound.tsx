@@ -4,7 +4,7 @@ import { type Component } from "solid-js";
 import { Title } from "@solidjs/meta";
 import { A } from "@solidjs/router";
 
-import Button from "../../components/ui/Button";
+import Button from "../../components/common/Button";
 
 const NotFound: Component = () => {
   return (

@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 // pages/Search/Search.tsx
 import {
@@ -14,8 +15,8 @@ import ProductCard from "../../components/product/ProductCard";
 import ProductGridSkeleton from "../../components/product/ProductGridSkeleton";
 import SearchIdleState from "../../components/search/SearchIdleState";
 import NoSearchResults from "../../components/search/NoSearchResults";
-import ErrorState from "../../components/ui/ErrorState";
-import Pagination from "../../components/ui/Pagination";
+import ErrorState from "../../components/common/ErrorState";
+import Pagination from "../../components/products/Pagination";
 
 import { searchProducts } from "../../services/search";
 

@@ -50,8 +50,13 @@ export interface ApiError {
   fieldErrors?: Record<string, string>;
 }
 
-/** پاسخِ سرور = یا موفقیت یا خطا. سرویس این را به `ApiSuccess` یا throw تبدیل می‌کند. */
-export type ApiResult<T> = ApiSuccess<T> | { error: ApiError };
+/**
+ * پاسخِ سرور = یا موفقیت یا خطا.
+ * `ok` discriminant به سرویس‌ها اجازه می‌دهد با if (res.ok) راحت تصمیم بگیرند.
+ */
+export type ApiResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: ApiError };
 
 /**
  * پارامترهای صفحه‌بندیِ درخواست — سمتِ *ورودیِ* صفحه‌بندی.
@@ -73,6 +78,8 @@ export interface Paginated<T> {
   pageSize: number;
   /** تعدادِ کلِ آیتم‌ها در همهٔ صفحه‌ها. */
   total: number;
+  /** تعدادِ کلِ صفحه‌ها. */
+  totalPages: number;
   /** آیا صفحهٔ بعدی وجود دارد — برای دکمهٔ «بیشتر». */
   hasMore: boolean;
 }

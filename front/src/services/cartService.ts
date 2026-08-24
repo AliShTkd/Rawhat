@@ -1,6 +1,6 @@
 // src/services/cartService.ts
 import { http } from "./http";
-import { useCartStore } from "../stores/cartStore";
+import { cartActions, snapshot, restore } from "../stores/cartStore";
 import type { Cart } from "../types/cart";
 
 /**
@@ -13,47 +13,43 @@ import type { Cart } from "../types/cart";
 /** الگوی مشترکِ هر کنشِ خوش‌بینانه: عکس بگیر → خوش‌بین شو → آشتی/برگرد. */
 async function optimistic(
   apply: () => void,
-  request: () => Promise<{ ok: true; data: Cart } | { ok: false; error: unknown }>,
+  requestFn: () => Promise<{ ok: true; data: Cart } | { ok: false; error: unknown }>,
 ): Promise<boolean> {
-  const store = useCartStore.getState();
-  const snapshot = store.snapshot(); // عکسِ فوری، قبل از هر تغییر.
+  const snap = snapshot();
 
-  apply();                            // حدسِ خوش‌بینانه — UI همین‌الان می‌پرد.
+  apply();
 
-  const res = await request();
+  const res = await requestFn();
   if (res.ok) {
-    store.setCart(res.data);          // جایگزینی با حقیقتِ سرور، نه صرفاً تأیید.
+    cartActions.setCart(res.data);
     return true;
   }
 
-  store.restore(snapshot);            // شکست → دقیقاً همان حالتِ قبل باز می‌گردد.
-  store.setCartError(res.error as any);
+  restore(snap);
+  cartActions.setCartError(res.error as any);
   return false;
 }
 
 /** افزودن به سبد — کلاسیک‌ترین کنشِ خوش‌بینانه. */
 export async function addItem(productId: string, qty = 1): Promise<boolean> {
-  const store = useCartStore.getState();
   return optimistic(
-    () => store.addItemOptimistic(productId, qty),
+    () => cartActions.addItemOptimistic(productId, qty),
     () => http.post<Cart>("/cart/items", { productId, qty }),
   );
 }
 
 /** تغییرِ تعداد — همان الگو؛ qty=0 را به حذف نگاشت نمی‌کنیم، کارِ استور است. */
 export async function updateQty(productId: string, qty: number): Promise<boolean> {
-  const store = useCartStore.getState();
   return optimistic(
-    () => store.updateQtyOptimistic(productId, qty),
+    () => cartActions.updateQtyOptimistic(productId, qty),
     () => http.patch<Cart>(`/cart/items/${productId}`, { qty }),
   );
 }
 
 /** حذفِ قلم — خوش‌بینانه ناپدید می‌شود، در شکست برمی‌گردد. */
 export async function removeItem(productId: string): Promise<boolean> {
-  const store = useCartStore.getState();
   return optimistic(
-    () => store.removeItemOptimistic(productId),
+    () => cartActions.removeItemOptimistic(productId),
     () => http.del<Cart>(`/cart/items/${productId}`),
   );
 }
@@ -64,13 +60,12 @@ export async function removeItem(productId: string): Promise<boolean> {
  * سبد سمتِ سرور زندگی می‌کند؛ هنگامِ ورود باید حقیقتِ سرور را بکشیم.
  */
 export async function loadCart(): Promise<void> {
-  const store = useCartStore.getState();
-  store.setCartLoading();
+  cartActions.setCartLoading();
 
   const res = await http.get<Cart>("/cart");
 
-  if (res.ok) store.setCart(res.data);
-  else store.setCartError(res.error);
+  if (res.ok) cartActions.setCart(res.data);
+  else cartActions.setCartError(res.error);
 }
 
 

@@ -1,7 +1,7 @@
 // FeaturedProductsSection.tsx
 import { Show, For, type Component } from "solid-js";
 // این Component را من نمی‌سازم؛ باید جداگانه بسازی.
-import ProductCard, { type Product } from "./ProductCard";
+import ProductCard, { type Product } from "../../components/product/ProductCard";
 
 export interface FeaturedProductsSectionProps {
   title?: string;

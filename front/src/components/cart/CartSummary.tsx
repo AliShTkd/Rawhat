@@ -1,8 +1,8 @@
 
 // CartSummary.tsx
 import { Show, type Component } from "solid-js";
-import Price from "./Price";
-import Button from "./Button";
+import Price from "../common/Price";
+import Button from "../common/Button";
 
 export interface CartSummaryProps {
   subtotal: number;

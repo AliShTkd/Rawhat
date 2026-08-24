@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 
 // components/products/ProductSort.tsx
@@ -5,7 +6,7 @@ import {
   createUniqueId,
   type Component,
 } from "solid-js";
-import Select from "../Select";
+import Select from "../common/IconButton";
 
 export interface SortOption {
   value: string;

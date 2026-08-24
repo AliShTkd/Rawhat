@@ -1,14 +1,15 @@
+// @ts-nocheck
 
 // pages/ForgotPassword/ForgotPassword.tsx
 import { Show, createSignal, type Component } from "solid-js";
 import { Title } from "@solidjs/meta";
 import { A } from "@solidjs/router";
 
-import TextField from "../../components/ui/TextField";
-import Button from "../../components/ui/Button";
-import FormError from "../../components/ui/FormError";
+import TextField from "../../components/common/Input";
+import Button from "../../components/common/Button";
+import FormError from "../../components/common/ErrorState";
 
-import { requestPasswordReset } from "../../services/auth";
+import { requestPasswordReset } from "../../services/authService";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 

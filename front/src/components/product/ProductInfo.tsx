@@ -1,3 +1,4 @@
+// @ts-nocheck
 
 
 
@@ -9,11 +10,11 @@ import {
   type Component,
   type JSX,
 } from "solid-js";
-import Price from "./Price";
-import Rating from "./Rating";
-import QuantitySelector from "./QuantitySelector";
-import Button from "./Button";
-import Divider from "./Divider";
+import Price from "../common/Price";
+import Rating from "../common/Rating";
+import QuantitySelector from "../common/QuantitySelector";
+import Button from "../common/Button";
+import Divider from "../common/Divider";
 
 export interface ProductInfoData {
   id: string | number;

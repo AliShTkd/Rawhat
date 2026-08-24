@@ -1,7 +1,7 @@
 
 // src/services/wishlistService.ts
 import { http } from "./http";
-import { useWishlistStore } from "../stores/wishlistStore";
+import { wishlistActions, isWishlisted as _isWishlisted } from "../stores/wishlistStore";
 import type { WishlistItem } from "../types/wishlist";
 
 /**
@@ -14,7 +14,7 @@ import type { WishlistItem } from "../types/wishlist";
 
 /** آیا این محصول همین‌الان در لیست هست؟ منبعِ خوش‌بینی و rollback. */
 function isIn(productId: string): boolean {
-  return useWishlistStore.getState().ids.has(productId);
+  return _isWishlisted(productId);
 }
 
 /**
@@ -23,14 +23,11 @@ function isIn(productId: string): boolean {
  * حدسِ محلی نهایی است، چون آیتمِ علاقه هیچ حقیقتِ سروری‌ای حمل نمی‌کند.
  */
 export async function toggle(productId: string): Promise<boolean> {
-  const store = useWishlistStore.getState();
-
   const wasIn = isIn(productId);   // عکسِ فوریِ همین یک بیت — کلِ چیزی که برای rollback لازم است.
   const willAdd = !wasIn;
 
-  // حدسِ خوش‌بینانه — قلب همین‌الان می‌پرد.
-  if (willAdd) store.addOptimistic(productId);
-  else store.removeOptimistic(productId);
+  if (willAdd) wishlistActions.addOptimistic(productId);
+  else wishlistActions.removeOptimistic(productId);
 
   const res = willAdd
     ? await http.post<WishlistItem>("/wishlist/items", { productId })
@@ -38,14 +35,11 @@ export async function toggle(productId: string): Promise<boolean> {
 
   if (res.ok) return true; // «تأیید» شد؛ چیزی برای جایگزینی نیست — حدسم خودش حقیقت بود.
 
-  // شکست → فقط اگر حالت هنوز همان حدسِ من باشد برگردان.
-  // اگر کلیکِ تازه‌تری وسط رسیده و بیت را عوض کرده، دست نمی‌زنیم:
-  // toggle خود-ترمیم است، و rollbackِ کور یک مسابقه می‌سازد.
   if (isIn(productId) === willAdd) {
-    if (wasIn) store.addOptimistic(productId);
-    else store.removeOptimistic(productId);
+    if (wasIn) wishlistActions.addOptimistic(productId);
+    else wishlistActions.removeOptimistic(productId);
   }
-  store.setError(res.error);
+  wishlistActions.setError(res.error);
   return false;
 }
 
@@ -55,13 +49,12 @@ export async function toggle(productId: string): Promise<boolean> {
  * لیست سمتِ سرور زندگی می‌کند؛ هنگامِ ورود حقیقتِ موجود را می‌کشیم.
  */
 export async function loadWishlist(): Promise<void> {
-  const store = useWishlistStore.getState();
-  store.setLoading();
+  wishlistActions.setLoading();
 
   const res = await http.get<WishlistItem[]>("/wishlist");
 
-  if (res.ok) store.setItems(res.data);
-  else store.setError(res.error);
+  if (res.ok) wishlistActions.setItems(res.data);
+  else wishlistActions.setError(res.error);
 }
 
 
